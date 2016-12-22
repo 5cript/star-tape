@@ -5,7 +5,7 @@
 namespace StarTape
 {
 //#####################################################################################################################
-    TapeEntry::TapeEntry(TapeArchive* archive, uint64_t startChunk, uint64_t endChunk, bool readHeader)
+    TapeEntry::TapeEntry(InputTapeArchive* archive, uint64_t startChunk, uint64_t endChunk, bool readHeader)
         : archive_{archive}
         , startChunk_{startChunk}
         , endChunk_{endChunk}

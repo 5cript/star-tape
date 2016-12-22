@@ -69,4 +69,8 @@ namespace StarTape
         std::array <Sparse, TAPER_SPARSES_IN_SPARSE_HEADER> sparses;
         char isExtended;
     };
+
+    StarHeader createHeaderFromDiskNode(std::string path);
+
+    std::string headerToString(StarHeader const& head);
 }

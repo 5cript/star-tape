@@ -1,10 +1,12 @@
 # star-tape
+
+(DO NOT USE, I ONLY SUPPORT WHAT I NEED - NO AUTOMATIC TESTS)
+(unless you want to submit pull request for fleshing this lib out, I'd gladly review and accept them)
+
 star-tape is a tarball reader and writer for people with small requirements.
-star-tape only supports the new UStar format.
+star-tape only supports the new UStar format and does not allow inplace operations.
 The tar does not have to be located on the disk, if you implement the ITapeReader and ITapeWriter interfaces.
 Two implementations already exist, for files (convenience adapter) and for streams.
-
-This library is not yet finished. See issues.
 
 ## Dependencies
 

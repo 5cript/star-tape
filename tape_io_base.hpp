@@ -6,5 +6,6 @@ namespace StarTape
     {
     public:
         virtual bool good() const = 0;
+        virtual ~ITapeIoBase() = default;
     };
 }

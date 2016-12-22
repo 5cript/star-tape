@@ -20,8 +20,13 @@ namespace StarTape
     {
 
     }
+//---------------------------------------------------------------------------------------------------------------------
+    uint64_t TapeRegion::getChunkCount() const
+    {
+        return 1 + endChunk - startChunk;
+    }
 //#####################################################################################################################
-    TapeIndex::TapeIndex(TapeArchive* archive)
+    TapeIndex::TapeIndex(InputTapeArchive* archive)
         : archive_{archive}
     {
         makeIndex();
@@ -104,7 +109,7 @@ namespace StarTape
         });
     }
 //---------------------------------------------------------------------------------------------------------------------
-    ITapeReader* TapeIndex::getContentReader(iterator entry)
+    ITapeReader* TapeIndex::getContentReader(iterator const& entry)
     {
         auto* reader = archive_->getReader();
         if (reader == nullptr)
@@ -114,7 +119,17 @@ namespace StarTape
         return reader;
     }
 //---------------------------------------------------------------------------------------------------------------------
-    std::string TapeIndex::readFile(iterator entry)
+    ITapeReader* TapeIndex::getHeaderReader(iterator const& entry)
+    {
+        auto* reader = archive_->getReader();
+        if (reader == nullptr)
+            throw std::runtime_error("the tar file is not opened for reading");
+
+        reader->seekg(entry->startChunk * Constants::ChunkSize);
+        return reader;
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    std::string TapeIndex::readFile(iterator const& entry)
     {
         auto reader = getContentReader(entry);
         if (reader == nullptr)
@@ -134,7 +149,7 @@ namespace StarTape
         return result;
     }
 //---------------------------------------------------------------------------------------------------------------------
-    std::ostream& TapeIndex::writeFileToStream(iterator entry, std::ostream& stream)
+    std::ostream& TapeIndex::writeFileToStream(iterator const& entry, std::ostream& stream)
     {
         auto reader = getContentReader(entry);
         if (reader == nullptr)
@@ -152,6 +167,16 @@ namespace StarTape
         } while (remainingRead > 0ull);
 
         return stream;
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    TapeIndex::iterator TapeIndex::erase(iterator const& entry)
+    {
+        return regions_.erase(entry);
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    void TapeIndex::filter(std::function <bool(TapeRegion const&)> predicate)
+    {
+        regions_.erase(std::remove_if(std::begin(regions_), std::end(regions_), predicate), std::end(regions_));
     }
 //#####################################################################################################################
 }

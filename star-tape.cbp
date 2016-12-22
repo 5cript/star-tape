@@ -39,11 +39,11 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="tape_archive.cpp" />
 		<Unit filename="tape_archive.hpp" />
-		<Unit filename="tape_chunk.hpp" />
 		<Unit filename="tape_core.hpp" />
 		<Unit filename="tape_entry.cpp" />
 		<Unit filename="tape_entry.hpp" />
 		<Unit filename="tape_fwd.hpp" />
+		<Unit filename="tape_header.cpp" />
 		<Unit filename="tape_header.hpp" />
 		<Unit filename="tape_index.cpp" />
 		<Unit filename="tape_index.hpp" />
@@ -53,8 +53,11 @@
 		<Unit filename="tape_io/tape_stream.cpp" />
 		<Unit filename="tape_io/tape_stream.hpp" />
 		<Unit filename="tape_io_base.hpp" />
+		<Unit filename="tape_operation.cpp" />
+		<Unit filename="tape_operation.hpp" />
 		<Unit filename="tape_reader.hpp" />
 		<Unit filename="tape_utility.hpp" />
+		<Unit filename="tape_writer.cpp" />
 		<Unit filename="tape_writer.hpp" />
 		<Extensions>
 			<code_completion />

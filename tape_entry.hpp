@@ -15,7 +15,7 @@ namespace StarTape
     class TapeEntry
     {
     public:
-        TapeEntry(TapeArchive* archive, uint64_t startChunk, uint64_t endChunk = 0 /* redundant for crawler */, bool readHeader = false);
+        TapeEntry(InputTapeArchive* archive, uint64_t startChunk, uint64_t endChunk = 0 /* redundant for crawler */, bool readHeader = false);
 
         /**
          *  Reads the header of the file and returns it.
@@ -62,7 +62,7 @@ namespace StarTape
         Constants::TypeFlags getEntryType() const;
 
     private:
-        TapeArchive* archive_;
+        InputTapeArchive* archive_;
         uint64_t startChunk_; // including header
         uint64_t endChunk_;
         boost::optional <StarHeader> header_;

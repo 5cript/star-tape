@@ -32,9 +32,10 @@ namespace StarTape
 
         void seekp(uint64_t position) override;
         void put(char c) override;
-        uint64_t write(char* string, uint64_t amount) override;
+        uint64_t write(char const* string, uint64_t amount) override;
         uint64_t tellp() const override;
         bool good() const override;
+        void seekEnd() override;
 
     private:
         std::ostream* ostream_;

@@ -57,7 +57,7 @@ namespace StarTape
         streamTape_.put(c);
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t FileTapeWriter::write(char* string, uint64_t amount)
+    uint64_t FileTapeWriter::write(char const* string, uint64_t amount)
     {
         return streamTape_.write(string, amount);
     }
@@ -70,6 +70,11 @@ namespace StarTape
     bool FileTapeWriter::good() const
     {
         return streamTape_.good();
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    void FileTapeWriter::seekEnd()
+    {
+        return streamTape_.seekEnd();
     }
 //#####################################################################################################################
     FileTape::FileTape(std::string const& file)
@@ -88,7 +93,7 @@ namespace StarTape
         streamTape_.put(c);
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t FileTape::write(char* string, uint64_t amount)
+    uint64_t FileTape::write(char const* string, uint64_t amount)
     {
         return streamTape_.write(string, amount);
     }
@@ -126,6 +131,11 @@ namespace StarTape
     uint64_t FileTape::getChunkCount()
     {
         return streamTape_.getChunkCount();
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    void FileTape::seekEnd()
+    {
+        streamTape_.seekEnd();
     }
 //#####################################################################################################################
 

@@ -64,7 +64,7 @@ namespace StarTape
         ostream_->put(c);
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t StreamTapeWriter::write(char* string, uint64_t amount)
+    uint64_t StreamTapeWriter::write(char const* string, uint64_t amount)
     {
         ostream_->write(string, amount);
         return amount;
@@ -78,6 +78,11 @@ namespace StarTape
     bool StreamTapeWriter::good() const
     {
         return ostream_->good();
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    void StreamTapeWriter::seekEnd()
+    {
+        ostream_->seekp(0, std::ios_base::end);
     }
 //#####################################################################################################################
     StreamTape::StreamTape(std::iostream* stream)
