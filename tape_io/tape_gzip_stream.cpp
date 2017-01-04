@@ -1,107 +1,94 @@
-#include "tape_stream.hpp"
-#include "../tape_core.hpp"
+#include "tape_gzip_stream.hpp"
+
+#include <boost/iostreams/filter/gzip.hpp>
 
 namespace StarTape
 {
 //#####################################################################################################################
-    StreamTapeReader::StreamTapeReader(std::istream* stream)
-        : istream_{stream}
+    GzipStreamTapeReader::GzipStreamTapeReader(std::istream* stream)
+        : reader_{}
     {
-
+        reader_.push(boost::iostreams::gzip_decompressor());
+        reader_.push(*stream);
     }
 //---------------------------------------------------------------------------------------------------------------------
-    void StreamTapeReader::seekg(uint64_t position)
+    void GzipStreamTapeReader::seekg(uint64_t position)
     {
-        istream_->seekg(position);
+        throw std::domain_error("cannot seek gzip stream");
     }
 //---------------------------------------------------------------------------------------------------------------------
-    char StreamTapeReader::get()
+    char GzipStreamTapeReader::get()
     {
-        return istream_->get();
+        return reader_.get();
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t StreamTapeReader::read(char* string, uint64_t amount)
+    uint64_t GzipStreamTapeReader::read(char* string, uint64_t amount)
     {
-        istream_->read(string, amount);
-        return istream_->gcount();
+        reader_.read(string, amount);
+        return reader_.gcount();
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t StreamTapeReader::tellg()
+    uint64_t GzipStreamTapeReader::tellg()
     {
-        return istream_->tellg();
+        throw std::domain_error("cannot seek gzip stream");
     }
 //---------------------------------------------------------------------------------------------------------------------
-    std::istream& StreamTapeReader::getStream()
+    boost::iostreams::filtering_istream& GzipStreamTapeReader::getStream()
     {
-        return *istream_;
+        return reader_;
     }
 //---------------------------------------------------------------------------------------------------------------------
-    bool StreamTapeReader::good() const
+    bool GzipStreamTapeReader::good() const
     {
-        return istream_->good();
+        return reader_.good();
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t StreamTapeReader::getChunkCount()
+    uint64_t GzipStreamTapeReader::getChunkCount()
     {
-        istream_->seekg(0u, std::ios::end);
-        auto size = istream_->tellg();
-        istream_->seekg(0u);
-        return size / Constants::ChunkSize;
+        throw std::domain_error("cannot determine chunk count");
     }
 //---------------------------------------------------------------------------------------------------------------------
-    bool StreamTapeReader::canSeek() const
+    bool GzipStreamTapeReader::canSeek() const
     {
-        return true;
+        return false;
     }
 //#####################################################################################################################
-    StreamTapeWriter::StreamTapeWriter(std::ostream* stream)
-        : ostream_{stream}
+    GzipStreamTapeWriter::GzipStreamTapeWriter(std::ostream* stream)
+        : writer_{}
     {
-
+        writer_.push(boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(boost::iostreams::gzip::best_compression)));
+        writer_.push(*stream);
     }
 //---------------------------------------------------------------------------------------------------------------------
-    void StreamTapeWriter::seekp(uint64_t position)
+    void GzipStreamTapeWriter::seekp(uint64_t position)
     {
-        ostream_->seekp(position);
+        throw std::domain_error("cannot seek gzip stream");
     }
 //---------------------------------------------------------------------------------------------------------------------
-    void StreamTapeWriter::put(char c)
+    void GzipStreamTapeWriter::put(char c)
     {
-        ostream_->put(c);
+        writer_.put(c);
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t StreamTapeWriter::write(char const* string, uint64_t amount)
+    uint64_t GzipStreamTapeWriter::write(char const* string, uint64_t amount)
     {
-        ostream_->write(string, amount);
+        writer_.write(string, amount);
         return amount;
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t StreamTapeWriter::tellp()
+    uint64_t GzipStreamTapeWriter::tellp()
     {
-        return ostream_->tellp();
+        throw std::domain_error("cannot seek gzip stream");
     }
 //---------------------------------------------------------------------------------------------------------------------
-    bool StreamTapeWriter::good() const
+    bool GzipStreamTapeWriter::good() const
     {
-        return ostream_->good();
+        return writer_.good();
     }
 //---------------------------------------------------------------------------------------------------------------------
-    void StreamTapeWriter::seekEnd()
+    void GzipStreamTapeWriter::seekEnd()
     {
-        ostream_->seekp(0, std::ios_base::end);
-    }
-//#####################################################################################################################
-    StreamTape::StreamTape(std::iostream* stream)
-        : StreamTapeReader(stream)
-        , StreamTapeWriter(stream)
-        , stream_{stream}
-    {
-
-    }
-//---------------------------------------------------------------------------------------------------------------------
-    bool StreamTape::good() const
-    {
-        return stream_->good();
+        throw std::domain_error("cannot seek gzip stream");
     }
 //#####################################################################################################################
 }

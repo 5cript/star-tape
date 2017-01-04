@@ -2,6 +2,8 @@
 
 #include "tape_utility.hpp"
 
+#include <algorithm>
+
 namespace StarTape
 {
 //#####################################################################################################################
@@ -10,8 +12,49 @@ namespace StarTape
         , startChunk_{startChunk}
         , endChunk_{endChunk}
     {
+        if (!archive->getReader()->canSeek())
+            throw std::domain_error("cannot seek on archive reader.");
+
         if (readHeader)
-            getHeader(); // called for side effects
+            getHeader();
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    TapeEntry::TapeEntry(InputTapeArchive* archive, char const* buffer, uint64_t startChunk, uint64_t endChunk)
+        : archive_{archive}
+        , startChunk_{startChunk}
+        , endChunk_{endChunk}
+    {
+        auto readPart = [&buffer](unsigned size, char* out)
+        {
+            std::copy(buffer, buffer + size, out);
+            buffer += size;
+        };
+
+        StarHeader head;
+
+        #define READ(NAME) readPart(head.NAME.size(), &head.NAME.front())
+        READ(fileName);
+        READ(fileMode);
+        READ(uid);
+        READ(gid);
+        READ(size);
+        READ(mTime);
+        READ(chksum);
+        readPart(1, &head.typeflag);
+        READ(linkName);
+        READ(magic);
+        READ(version);
+        READ(uName);
+        READ(gName);
+        READ(devMajor);
+        READ(devMinor);
+        READ(prefix);
+        #undef READ
+
+        header_ = head;
+
+        if (getFormat() != TarFormat::UStar)
+            throw std::runtime_error("only ustar format is supported");
     }
 //---------------------------------------------------------------------------------------------------------------------
     StarHeader* TapeEntry::getHeader()
@@ -25,7 +68,7 @@ namespace StarTape
 
         // validate header format first:
         if (getFormat() != TarFormat::UStar)
-            throw std::runtime_error("gnu tar format is not supported");
+            throw std::runtime_error("only ustar format is supported");
 
         reader->seekg(Constants::ChunkSize * startChunk_);
 
@@ -63,6 +106,8 @@ namespace StarTape
         else
             readHeaderEntry <Constants::MagicHeaderOffset, 6> (magic);
 
+        if (magic[0] != 'u' || magic[1] != 's' || magic[2] != 't' || magic[3] != 'a' || magic[4] != 'r')
+            return TarFormat::Other;
         return magic[5] == ' ' ? TarFormat::Gnu : TarFormat::UStar;
     }
 //---------------------------------------------------------------------------------------------------------------------
@@ -89,13 +134,15 @@ namespace StarTape
 //---------------------------------------------------------------------------------------------------------------------}
     std::string TapeEntry::getFileName() const
     {
-        std::array <char, 100> fname;
         if (header_)
-            fname = header_.get().fileName;
+            return concatFileName(header_.get());
         else
-            readHeaderEntry <Constants::FileNameHeaderOffset, 100> (fname);
-
-        return {std::begin(fname), std::end(fname)};
+        {
+            StarHeader tempHead;
+            readHeaderEntry <Constants::PrefixHeaderOffset, tempHead.prefix.max_size()> (tempHead.prefix);
+            readHeaderEntry <Constants::FileNameHeaderOffset, tempHead.fileName.max_size()> (tempHead.fileName);
+            return concatFileName(tempHead);
+        }
     }
 //---------------------------------------------------------------------------------------------------------------------
     Constants::TypeFlags TapeEntry::getEntryType() const
@@ -104,7 +151,7 @@ namespace StarTape
         if (header_)
             type = header_.get().typeflag;
         else
-            readHeaderEntry <Constants::EntryTypeOffset> (type);
+            readHeaderEntry <Constants::EntryTypeHeaderOffset> (type);
 
         return static_cast <Constants::TypeFlags> (type);
     }

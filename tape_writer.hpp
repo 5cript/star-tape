@@ -41,7 +41,7 @@ namespace StarTape
         /**
          *  Returns the cursor position.
          **/
-        virtual uint64_t tellp() const = 0;
+        virtual uint64_t tellp() = 0;
     };
 
     ITapeWriter* operator<<(ITapeWriter* lhs, std::istream& stream);

@@ -13,11 +13,11 @@ namespace StarTape { namespace TapeOperations
 //#####################################################################################################################
     ITapeWriter* write(ITapeWriter* lhs, ITapeReader* rhs, uint64_t chunkCount)
     {
-        char buffer[512];
+        char buffer[Constants::ChunkSize];
         for (uint64_t i = 0ull; i != chunkCount; ++i)
         {
-            rhs->read(buffer, 512);
-            lhs->write(buffer, 512);
+            rhs->read(buffer, Constants::ChunkSize);
+            lhs->write(buffer, Constants::ChunkSize);
         }
         return lhs;
     }
@@ -93,6 +93,9 @@ namespace StarTape { namespace TapeOperations
 //#####################################################################################################################
     bool Adopt::apply(TapeIndex* baseTape, OutputTapeArchive* destinationTape, TapeModificationContext* ctx)
     {
+        if (!baseTape->getArchive()->getReader()->canSeek())
+            throw std::domain_error("cannot adopt from tape reader which does not support seek");
+
         for (auto i = std::begin(*baseTape); i != std::end(*baseTape); ++i)
         {
             auto* reader = baseTape->getHeaderReader(i);

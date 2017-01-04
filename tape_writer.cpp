@@ -1,4 +1,5 @@
 #include "tape_writer.hpp"
+#include "tape_core.hpp"
 
 #include <array>
 
@@ -7,7 +8,7 @@ namespace StarTape
 //#####################################################################################################################
     void fill(ITapeWriter* lhs, uint64_t written)
     {
-        auto trail = 512 - (written%512);
+        auto trail = Constants::ChunkSize - (written % Constants::ChunkSize);
         while (trail--)
             lhs->put('\0');
     }
@@ -36,6 +37,7 @@ namespace StarTape
         lhs->write(string.c_str(), string.length());
 
         fill(lhs, string.length());
+        return lhs;
     }
 //#####################################################################################################################
 }

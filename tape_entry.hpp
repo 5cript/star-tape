@@ -3,7 +3,6 @@
 #include "tape_core.hpp"
 #include "tape_fwd.hpp"
 #include "tape_header.hpp"
-#include "tape_io.hpp"
 #include "tape_archive.hpp"
 
 #include <cstdint>
@@ -16,6 +15,11 @@ namespace StarTape
     {
     public:
         TapeEntry(InputTapeArchive* archive, uint64_t startChunk, uint64_t endChunk = 0 /* redundant for crawler */, bool readHeader = false);
+
+        /**
+         *  Create type entry from read chunk. The buffer must be exactly Contants::ChunkSize long.
+         **/
+        TapeEntry(InputTapeArchive* archive, char const* buffer, uint64_t startChunk, uint64_t endChunk = 0 /* redundant for crawler */);
 
         /**
          *  Reads the header of the file and returns it.

@@ -18,9 +18,10 @@ namespace StarTape
         void seekg(uint64_t position) override;
         char get() override;
         uint64_t read(char* string, uint64_t amount) override;
-        uint64_t tellg() const override;
+        uint64_t tellg() override;
         bool good() const override;
         uint64_t getChunkCount() override;
+        bool canSeek() const override;
 
     private:
         std::ifstream file_;
@@ -35,7 +36,7 @@ namespace StarTape
         void seekp(uint64_t position) override;
         void put(char c) override;
         uint64_t write(char const* string, uint64_t amount) override;
-        uint64_t tellp() const override;
+        uint64_t tellp() override;
         bool good() const override;
         void seekEnd() override;
 
@@ -52,11 +53,11 @@ namespace StarTape
         void seekp(uint64_t position) override;
         void put(char c) override;
         uint64_t write(char const* string, uint64_t amount) override;
-        uint64_t tellp() const override;
+        uint64_t tellp() override;
         void seekg(uint64_t position) override;
         char get() override;
         uint64_t read(char* string, uint64_t amount) override;
-        uint64_t tellg() const override;
+        uint64_t tellg() override;
         bool good() const override;
         uint64_t getChunkCount() override;
         void seekEnd() override;

@@ -36,11 +36,16 @@ namespace StarTape
         /**
          *  Returns the cursor position.
          **/
-        virtual uint64_t tellg() const = 0;
+        virtual uint64_t tellg() = 0;
 
         /**
          *  Returns the amount of chunks contained in the file.
          **/
         virtual uint64_t getChunkCount() = 0;
+
+        /**
+         *  Compressed streams do not support seeking.
+         **/
+        virtual bool canSeek() const = 0;
     };
 }

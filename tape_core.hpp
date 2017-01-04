@@ -5,7 +5,8 @@ namespace StarTape
     enum class TarFormat
     {
         Gnu,
-        UStar
+        UStar,
+        Other
     };
 
     namespace Constants

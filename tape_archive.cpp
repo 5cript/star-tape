@@ -18,9 +18,9 @@ namespace StarTape
             throw std::runtime_error("reader not good");
     }
 //---------------------------------------------------------------------------------------------------------------------
-    TapeIndex InputTapeArchive::makeIndex()
+    TapeIndex InputTapeArchive::makeIndex(std::ostream* dump)
     {
-        return {this};
+        return {this, dump};
     }
 //---------------------------------------------------------------------------------------------------------------------
     uint64_t InputTapeArchive::getChunkCount() const
@@ -28,6 +28,22 @@ namespace StarTape
         if (reader_)
             return reader_->getChunkCount();
         return 0;
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    std::ostream& InputTapeArchive::dump(std::ostream& stream) const
+    {
+        if (reader_ == nullptr)
+            throw std::runtime_error("archive not openend");
+        if (!reader_->good())
+            throw std::runtime_error("reader is not good");
+
+        char buffer[4096];
+        uint64_t read = 0;
+        do {
+            read = reader_->read(buffer, 4096);
+            stream.write(buffer, read);
+        } while (read == 4096);
+        return stream;
     }
 //#####################################################################################################################
     ITapeWriter* OutputTapeArchive::getWriter() const

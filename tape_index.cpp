@@ -26,22 +26,23 @@ namespace StarTape
         return 1 + endChunk - startChunk;
     }
 //#####################################################################################################################
-    TapeIndex::TapeIndex(InputTapeArchive* archive)
+    TapeIndex::TapeIndex(InputTapeArchive* archive, std::ostream* dump)
         : archive_{archive}
     {
-        makeIndex();
+        makeIndex(dump);
     }
 //---------------------------------------------------------------------------------------------------------------------
-    void TapeIndex::makeIndex()
+    void TapeIndex::makeIndex(std::ostream* dump)
     {
         regions_.clear();
 
-        auto chunkCount = archive_->getChunkCount();
-        for (uint64_t currentChunk = 0u; currentChunk != chunkCount; ++currentChunk)
+        if (archive_->getReader() == nullptr || !archive_->getReader()->good())
+            throw std::runtime_error("archive not opened");
+
+        auto insertRegion = [this](TapeEntry& entry, uint64_t currentChunk)
         {
-            TapeEntry entry{archive_, currentChunk};
             auto fileSize = entry.getFileSize();
-            auto endChunk = currentChunk + fileSize / 512u + !!(fileSize % 512u);
+            auto endChunk = currentChunk + fileSize / Constants::ChunkSize + !!(fileSize % Constants::ChunkSize);
             regions_.emplace_back (
                 [&entry](){
                     std::string fname = entry.getFileName();
@@ -54,7 +55,85 @@ namespace StarTape
                 currentChunk,
                 endChunk
             );
-            currentChunk = endChunk;
+            return endChunk;
+        };
+
+        auto* reader = archive_->getReader();
+        if (reader->canSeek())
+        {
+            ///
+            /// CanSeek Implementation
+            ///
+            auto chunkCount = archive_->getChunkCount();
+            for (unsigned currentChunk = 0u; currentChunk != chunkCount; ++currentChunk)
+            {
+                TapeEntry entry{archive_, currentChunk};
+                currentChunk = insertRegion(entry, currentChunk);
+            }
+        }
+        else
+        {
+            ///
+            /// CanNotSeek Implementation
+            ///
+            char chunk[Constants::ChunkSize];
+            uint64_t readAmount = 0ull;
+            unsigned currentChunk = 0u;
+
+            auto readChunk = [&readAmount, &chunk, &reader, dump]()
+            {
+                readAmount = reader->read(chunk, Constants::ChunkSize);
+                if (dump)
+                    dump->write(chunk, readAmount);
+            };
+
+            do {
+                readChunk();
+                if (readAmount == 0)
+                    break;
+                if (readAmount != Constants::ChunkSize)
+                    throw std::runtime_error("tar file ends on incorrect chunk size");
+
+                // must be EOF
+                if (chunk[0] == '\0')
+                    return;
+
+                TapeEntry entry{archive_, chunk, currentChunk};
+                auto endChunk = insertRegion(entry, currentChunk);
+
+                // read rest of file
+                while (currentChunk != endChunk)
+                {
+                    readChunk();
+                    if (readAmount == 0)
+                        break;
+                    if (readAmount != Constants::ChunkSize)
+                        throw std::runtime_error("tar file ends on incorrect chunk size");
+
+                    currentChunk++;
+                }
+                currentChunk++;
+            } while (readAmount == Constants::ChunkSize);
+
+            // must be EOF
+            auto checkChunkEmpty = [&chunk]()
+            {
+                for (auto const i : chunk)
+                    if (i != '\0')
+                        return false;
+                return true;
+            };
+
+            if (!checkChunkEmpty())
+                throw std::runtime_error("end of file marker expected");
+            readChunk();
+            if (!checkChunkEmpty())
+                throw std::runtime_error("end of file marker expected");
+            readChunk();
+            if (readAmount != 0)
+                throw std::runtime_error("end of file marker expected");
+            else
+                return;
         }
     }
 //---------------------------------------------------------------------------------------------------------------------
@@ -177,6 +256,11 @@ namespace StarTape
     void TapeIndex::filter(std::function <bool(TapeRegion const&)> predicate)
     {
         regions_.erase(std::remove_if(std::begin(regions_), std::end(regions_), predicate), std::end(regions_));
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    InputTapeArchive* TapeIndex::getArchive() const
+    {
+        return archive_;
     }
 //#####################################################################################################################
 }

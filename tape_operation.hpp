@@ -89,6 +89,9 @@ namespace StarTape
             StarHeader header_;
         };
 
+        /**
+         *  Clones all from other tape (over TapeIndex)
+         **/
         class Adopt : public TapeModifierCloneable <Adopt>
         {
         public:

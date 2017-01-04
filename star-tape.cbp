@@ -35,10 +35,17 @@
 		<Linker>
 			<Add option="-lboost_filesystem-mt" />
 			<Add option="-lboost_system-mt" />
+			<Add option="-lboost_iostreams-mt" />
+			<Add option="-lz" />
+			<Add option="-lbz2" />
 		</Linker>
 		<Unit filename="main.cpp" />
+		<Unit filename="star_tape.hpp" />
 		<Unit filename="tape_archive.cpp" />
 		<Unit filename="tape_archive.hpp" />
+		<Unit filename="tape_config.hpp" />
+		<Unit filename="tape_convenience.cpp" />
+		<Unit filename="tape_convenience.hpp" />
 		<Unit filename="tape_core.hpp" />
 		<Unit filename="tape_entry.cpp" />
 		<Unit filename="tape_entry.hpp" />
@@ -47,9 +54,12 @@
 		<Unit filename="tape_header.hpp" />
 		<Unit filename="tape_index.cpp" />
 		<Unit filename="tape_index.hpp" />
-		<Unit filename="tape_io.hpp" />
+		<Unit filename="tape_io/tape_bzip2_stream.cpp" />
+		<Unit filename="tape_io/tape_bzip2_stream.hpp" />
 		<Unit filename="tape_io/tape_file.cpp" />
 		<Unit filename="tape_io/tape_file.hpp" />
+		<Unit filename="tape_io/tape_gzip_stream.cpp" />
+		<Unit filename="tape_io/tape_gzip_stream.hpp" />
 		<Unit filename="tape_io/tape_stream.cpp" />
 		<Unit filename="tape_io/tape_stream.hpp" />
 		<Unit filename="tape_io_base.hpp" />

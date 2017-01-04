@@ -1,16 +1,19 @@
 #pragma once
 
+#include "../tape_config.hpp"
 #include "../tape_reader.hpp"
 #include "../tape_writer.hpp"
+
+#include <boost/iostreams/filtering_stream.hpp>
 
 #include <iostream>
 
 namespace StarTape
 {
-    class StreamTapeReader : public ITapeReader
+    class Bzip2StreamTapeReader : public ITapeReader
     {
     public:
-        StreamTapeReader(std::istream* stream);
+        Bzip2StreamTapeReader(std::istream* stream);
 
         void seekg(uint64_t position) override;
         char get() override;
@@ -20,16 +23,16 @@ namespace StarTape
         uint64_t getChunkCount() override;
         bool canSeek() const override;
 
-        std::istream& getStream();
+        boost::iostreams::filtering_istream& getStream();
 
     private:
-        std::istream* istream_;
+        boost::iostreams::filtering_istream reader_;
     };
 
-    class StreamTapeWriter : public ITapeWriter
+    class Bzip2StreamTapeWriter : public ITapeWriter
     {
     public:
-        StreamTapeWriter(std::ostream* stream);
+        Bzip2StreamTapeWriter(std::ostream* stream);
 
         void seekp(uint64_t position) override;
         void put(char c) override;
@@ -39,16 +42,6 @@ namespace StarTape
         void seekEnd() override;
 
     private:
-        std::ostream* ostream_;
-    };
-
-    class StreamTape : public StreamTapeReader, public StreamTapeWriter
-    {
-    public:
-        StreamTape(std::iostream* stream);
-        bool good() const override;
-
-    private:
-        std::iostream* stream_;
+        boost::iostreams::filtering_ostream writer_;
     };
 }

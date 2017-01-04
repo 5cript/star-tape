@@ -27,7 +27,8 @@ namespace StarTape
         constexpr unsigned int MagicHeaderOffset = 257U;
         constexpr unsigned int SizeHeaderOffset = 124U;
         constexpr unsigned int FileNameHeaderOffset = 0U;
-        constexpr unsigned int EntryTypeOffset = 156U;
+        constexpr unsigned int EntryTypeHeaderOffset = 156U;
+        constexpr unsigned int PrefixHeaderOffset = 345u;
     }
 
     struct PosixHeader
@@ -73,4 +74,6 @@ namespace StarTape
     StarHeader createHeaderFromDiskNode(std::string path);
 
     std::string headerToString(StarHeader const& head);
+
+    std::string concatFileName(StarHeader const& head);
 }

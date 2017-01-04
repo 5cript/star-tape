@@ -1,9 +1,10 @@
 #pragma once
 
 #include "tape_fwd.hpp"
-#include "tape_io.hpp"
 #include "tape_index.hpp"
 #include "tape_operation.hpp"
+
+#include <iostream>
 
 namespace StarTape
 {
@@ -16,6 +17,8 @@ namespace StarTape
     class InputTapeArchive : public TapeArchive
     {
     public:
+        InputTapeArchive() = default;
+
         /**
          *  May return nullptr, if not opened for reading.
          **/
@@ -33,8 +36,21 @@ namespace StarTape
 
         /**
          *  Make an index for the tape.
+         *  Discouraged for compressed archives.
+         *
+         *  @param dump A stream to write the archive to. Ignored for archive readers that support seeking.
          **/
-        TapeIndex makeIndex();
+        TapeIndex makeIndex(std::ostream* dump = nullptr);
+
+        /**
+         *  Copies entire archive into stream.
+         **/
+        std::ostream& dump(std::ostream& stream) const;
+
+        InputTapeArchive(InputTapeArchive const&) = default;
+        InputTapeArchive(InputTapeArchive&&) = default;
+        InputTapeArchive& operator=(InputTapeArchive const&) = default;
+        InputTapeArchive& operator=(InputTapeArchive&&) = default;
     private:
         ITapeReader* reader_;
     };
@@ -42,6 +58,8 @@ namespace StarTape
     class OutputTapeArchive : public TapeArchive
     {
     public:
+        OutputTapeArchive() = default;
+
         /**
          *  May return nullptr, if not opened for writing.
          **/
@@ -51,6 +69,11 @@ namespace StarTape
          *  Open Tape for writing.
          **/
         void open(ITapeWriter* writer);
+
+        OutputTapeArchive(OutputTapeArchive const&) = default;
+        OutputTapeArchive(OutputTapeArchive&&) = default;
+        OutputTapeArchive& operator=(OutputTapeArchive const&) = default;
+        OutputTapeArchive& operator=(OutputTapeArchive&&) = default;
 
     private:
         ITapeWriter* writer_;

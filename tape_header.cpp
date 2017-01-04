@@ -291,5 +291,18 @@ namespace StarTape
 
         return res;
     }
+//---------------------------------------------------------------------------------------------------------------------
+    std::string concatFileName(StarHeader const& head)
+    {
+        if (head.prefix[0] == '\0')
+            return {std::begin(head.fileName), std::end(head.fileName)};
+        else
+        {
+            std::string fname;
+            for (int i = 0; i != head.prefix.size() && head.prefix[i] != '\0'; ++i)
+                fname.push_back(head.prefix[i]);
+            return fname + "/" + std::string{std::begin(head.fileName), std::end(head.fileName)};
+        }
+    }
 //#####################################################################################################################
 }

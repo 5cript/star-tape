@@ -1,107 +1,94 @@
-#include "tape_stream.hpp"
-#include "../tape_core.hpp"
+#include "tape_bzip2_stream.hpp"
+
+#include <boost/iostreams/filter/bzip2.hpp>
 
 namespace StarTape
 {
 //#####################################################################################################################
-    StreamTapeReader::StreamTapeReader(std::istream* stream)
-        : istream_{stream}
+    Bzip2StreamTapeReader::Bzip2StreamTapeReader(std::istream* stream)
+        : reader_{}
     {
-
+        reader_.push(boost::iostreams::bzip2_decompressor());
+        reader_.push(*stream);
     }
 //---------------------------------------------------------------------------------------------------------------------
-    void StreamTapeReader::seekg(uint64_t position)
+    void Bzip2StreamTapeReader::seekg(uint64_t position)
     {
-        istream_->seekg(position);
+        throw std::domain_error("cannot seek bzip2 stream");
     }
 //---------------------------------------------------------------------------------------------------------------------
-    char StreamTapeReader::get()
+    char Bzip2StreamTapeReader::get()
     {
-        return istream_->get();
+        return reader_.get();
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t StreamTapeReader::read(char* string, uint64_t amount)
+    uint64_t Bzip2StreamTapeReader::read(char* string, uint64_t amount)
     {
-        istream_->read(string, amount);
-        return istream_->gcount();
+        reader_.read(string, amount);
+        return reader_.gcount();
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t StreamTapeReader::tellg()
+    uint64_t Bzip2StreamTapeReader::tellg()
     {
-        return istream_->tellg();
+        throw std::domain_error("cannot seek bzip2 stream");
     }
 //---------------------------------------------------------------------------------------------------------------------
-    std::istream& StreamTapeReader::getStream()
+    boost::iostreams::filtering_istream& Bzip2StreamTapeReader::getStream()
     {
-        return *istream_;
+        return reader_;
     }
 //---------------------------------------------------------------------------------------------------------------------
-    bool StreamTapeReader::good() const
+    bool Bzip2StreamTapeReader::good() const
     {
-        return istream_->good();
+        return reader_.good();
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t StreamTapeReader::getChunkCount()
+    uint64_t Bzip2StreamTapeReader::getChunkCount()
     {
-        istream_->seekg(0u, std::ios::end);
-        auto size = istream_->tellg();
-        istream_->seekg(0u);
-        return size / Constants::ChunkSize;
+        throw std::domain_error("cannot determine chunk count");
     }
 //---------------------------------------------------------------------------------------------------------------------
-    bool StreamTapeReader::canSeek() const
+    bool Bzip2StreamTapeReader::canSeek() const
     {
-        return true;
+        return false;
     }
 //#####################################################################################################################
-    StreamTapeWriter::StreamTapeWriter(std::ostream* stream)
-        : ostream_{stream}
+    Bzip2StreamTapeWriter::Bzip2StreamTapeWriter(std::ostream* stream)
+        : writer_{}
     {
-
+        writer_.push(boost::iostreams::bzip2_compressor(boost::iostreams::bzip2_params()));
+        writer_.push(*stream);
     }
 //---------------------------------------------------------------------------------------------------------------------
-    void StreamTapeWriter::seekp(uint64_t position)
+    void Bzip2StreamTapeWriter::seekp(uint64_t position)
     {
-        ostream_->seekp(position);
+        throw std::domain_error("cannot seek bzip2 stream");
     }
 //---------------------------------------------------------------------------------------------------------------------
-    void StreamTapeWriter::put(char c)
+    void Bzip2StreamTapeWriter::put(char c)
     {
-        ostream_->put(c);
+        writer_.put(c);
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t StreamTapeWriter::write(char const* string, uint64_t amount)
+    uint64_t Bzip2StreamTapeWriter::write(char const* string, uint64_t amount)
     {
-        ostream_->write(string, amount);
+        writer_.write(string, amount);
         return amount;
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t StreamTapeWriter::tellp()
+    uint64_t Bzip2StreamTapeWriter::tellp()
     {
-        return ostream_->tellp();
+        throw std::domain_error("cannot seek bzip2 stream");
     }
 //---------------------------------------------------------------------------------------------------------------------
-    bool StreamTapeWriter::good() const
+    bool Bzip2StreamTapeWriter::good() const
     {
-        return ostream_->good();
+        return writer_.good();
     }
 //---------------------------------------------------------------------------------------------------------------------
-    void StreamTapeWriter::seekEnd()
+    void Bzip2StreamTapeWriter::seekEnd()
     {
-        ostream_->seekp(0, std::ios_base::end);
-    }
-//#####################################################################################################################
-    StreamTape::StreamTape(std::iostream* stream)
-        : StreamTapeReader(stream)
-        , StreamTapeWriter(stream)
-        , stream_{stream}
-    {
-
-    }
-//---------------------------------------------------------------------------------------------------------------------
-    bool StreamTape::good() const
-    {
-        return stream_->good();
+        throw std::domain_error("cannot seek bzip2 stream");
     }
 //#####################################################################################################################
 }

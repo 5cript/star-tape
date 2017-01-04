@@ -25,7 +25,7 @@ namespace StarTape
         return streamTape_.read(string, amount);
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t FileTapeReader::tellg() const
+    uint64_t FileTapeReader::tellg()
     {
         return streamTape_.tellg();
     }
@@ -38,6 +38,11 @@ namespace StarTape
     uint64_t FileTapeReader::getChunkCount()
     {
         return streamTape_.getChunkCount();
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    bool FileTapeReader::canSeek() const
+    {
+        return true;
     }
 //#####################################################################################################################
     FileTapeWriter::FileTapeWriter(std::string const& file)
@@ -62,7 +67,7 @@ namespace StarTape
         return streamTape_.write(string, amount);
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t FileTapeWriter::tellp() const
+    uint64_t FileTapeWriter::tellp()
     {
         return streamTape_.tellp();
     }
@@ -98,7 +103,7 @@ namespace StarTape
         return streamTape_.write(string, amount);
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t FileTape::tellp() const
+    uint64_t FileTape::tellp()
     {
         return streamTape_.tellp();
     }
@@ -118,7 +123,7 @@ namespace StarTape
         return streamTape_.read(string, amount);
     }
 //---------------------------------------------------------------------------------------------------------------------
-    uint64_t FileTape::tellg() const
+    uint64_t FileTape::tellg()
     {
         return streamTape_.tellg();
     }

@@ -5,6 +5,7 @@
 #include "tape_header.hpp"
 #include "tape_reader.hpp"
 
+#include <iostream>
 #include <vector>
 #include <string>
 #include <functional>
@@ -33,9 +34,9 @@ namespace StarTape
         using const_iterator = std::vector <TapeRegion>::const_iterator;
 
     public:
-        TapeIndex(InputTapeArchive* archive);
+        TapeIndex(InputTapeArchive* archive, std::ostream* dump = nullptr);
 
-        operator std::vector <TapeRegion>&()
+        explicit operator std::vector <TapeRegion>&()
         {
             return regions_;
         }
@@ -90,8 +91,13 @@ namespace StarTape
          */
         iterator erase(iterator const& entry);
 
+        /**
+         *  Returns the archive.
+         **/
+        InputTapeArchive* getArchive() const;
+
     private:
-        void makeIndex();
+        void makeIndex(std::ostream* dump);
 
     private:
         InputTapeArchive* archive_;
