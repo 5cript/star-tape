@@ -53,6 +53,8 @@ namespace StarTape
         std::array <char, 8> devMajor;
         std::array <char, 8> devMinor;
         std::array <char, 155> prefix;
+
+        StarHeader() = default;
     };
 
     struct Sparse
@@ -72,6 +74,8 @@ namespace StarTape
     };
 
     StarHeader createHeaderFromDiskNode(std::string path);
+    StarHeader createHeaderFromString(std::string const& path, std::string const& dataString);
+    StarHeader createHeader(std::string const& path, std::size_t size, bool checksum);
 
     std::string headerToString(StarHeader const& head);
 

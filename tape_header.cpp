@@ -3,6 +3,7 @@
 #include "tape_utility.hpp"
 
 #include <boost/filesystem.hpp>
+#include <chrono>
 
 namespace fs = boost::filesystem;
 
@@ -41,37 +42,59 @@ namespace StarTape
         std::fill(std::begin(arr), std::end(arr), '\0');
     }
 //#####################################################################################################################
-    StarHeader createHeaderFromDiskNode(std::string path)
+    #define HEADER_ASSIGN(FIELD, STRING) \
+    assign <header.FIELD.size()>(header.FIELD, STRING)
+
+    #define HEADER_ASSIGN_OCTAL(FIELD, STRING) \
+    assignOctal <header.FIELD.size()> (header.FIELD, STRING)
+
+    #define HEADER_CLEAR(FIELD) \
+    clear <header.FIELD.size()> (header.FIELD)
+//---------------------------------------------------------------------------------------------------------------------
+    void calculateChecksum(StarHeader& header)
     {
-        #define HEADER_ASSIGN(FIELD, STRING) \
-        assign <header.FIELD.size()>(header.FIELD, STRING)
+        uint32_t checksum = 0u;
 
-        #define HEADER_ASSIGN_OCTAL(FIELD, STRING) \
-        assignOctal <header.FIELD.size()> (header.FIELD, STRING)
+        std::array <char, 7> sum;
 
-        #define HEADER_CLEAR(FIELD) \
-        clear <header.FIELD.size()> (header.FIELD)
+        #define CHKSUM(FIELD) \
+        for (auto const& i : header.FIELD) \
+            checksum += static_cast <unsigned char> (i);
 
+        CHKSUM(fileName)
+        CHKSUM(fileMode)
+        CHKSUM(uid)
+        CHKSUM(gid)
+        CHKSUM(size)
+        CHKSUM(mTime)
+        CHKSUM(linkName)
+        CHKSUM(magic)
+        CHKSUM(version)
+        CHKSUM(uName)
+        CHKSUM(gName)
+        CHKSUM(devMajor)
+        CHKSUM(devMinor)
+        CHKSUM(prefix)
+
+        checksum += 8u * 32u;
+        checksum += static_cast <unsigned char> (header.typeflag);
+
+        assignOctal <7> (sum, checksum);
+        for (int i = 0; i != 7; ++i)
+            header.chksum[i] = sum[i];
+        header.chksum[7] = ' ';
+
+        #undef CHKSUM
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    fs::path splitPath(StarHeader& header, std::string path, bool isDir = false)
+    {
         preprocessPath(path);
-
-        /////////////////////////////////////////////////////////////////////////////////////////////
-        // PATH
-        /////////////////////////////////////////////////////////////////////////////////////////////
-
-        StarHeader header;
-        if (path.length() > 255)
-            throw std::invalid_argument("path size is too large (>255)");
 
         fs::path p{path};
 
-        if (!fs::exists(p))
-            throw std::invalid_argument("file does not exist");
-
-        auto isDir = fs::is_directory(p);
-        auto isRegFile = fs::is_regular_file(p);
-
-        if (!isDir && !isRegFile)
-            throw std::invalid_argument("disk node is neither a regular file nor a directory");
+        if (path.length() > 255)
+            throw std::invalid_argument("path size is too large (>255)");
 
         // path is too long, try to split:
         if (path.length() > 100)
@@ -116,12 +139,24 @@ namespace StarTape
             HEADER_CLEAR(prefix);
         }
 
+        return p;
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    std::pair <StarHeader, fs::path> createHeaderCommon(std::string path, bool isDir = false)
+    {
+        StarHeader header;
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // PATH
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        auto p = splitPath(header, path, isDir);
+
         /////////////////////////////////////////////////////////////////////////////////////////////
         // MODE
         /////////////////////////////////////////////////////////////////////////////////////////////
 
-        auto status = fs::status(p);
-        HEADER_ASSIGN_OCTAL(fileMode, status.permissions());
+        HEADER_CLEAR(fileMode);
 
         /////////////////////////////////////////////////////////////////////////////////////////////
         // UID
@@ -134,6 +169,140 @@ namespace StarTape
         /////////////////////////////////////////////////////////////////////////////////////////////
 
         HEADER_CLEAR(gid);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // LINK NAME
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        HEADER_CLEAR(linkName);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // MAGIC
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        HEADER_ASSIGN(magic, "ustar");
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // VERSION
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        HEADER_ASSIGN(version, "00");
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // USER NAME
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        // I cannot be bothered with a proper solution here. try for env. variables, and clear if not available.
+        char * user_name = getenv("USER");
+        if (!user_name)
+             user_name = getenv("USERNAME");
+        if (user_name)
+            HEADER_ASSIGN(uName, user_name);
+        else
+            HEADER_CLEAR(uName);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // GROUP NAME
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        // not portable -> clear
+        HEADER_CLEAR(gName);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // DEV MAJOR
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        HEADER_ASSIGN_OCTAL(devMajor, 0);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // DEV MINOR
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        HEADER_ASSIGN_OCTAL(devMinor, 0);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // FILE TYPE
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        header.typeflag = '0';
+
+        return {header, p};
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    StarHeader createHeaderFromString(std::string const& path, std::string const& dataString)
+    {
+        auto header = createHeader(path, dataString.length(), false);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // MODE
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        HEADER_ASSIGN_OCTAL(fileMode,
+            fs::owner_read | fs::owner_write |
+            fs::group_read | fs::group_write |
+            fs::others_read | fs::others_write
+        );
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // CHECKSUM
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        calculateChecksum(header);
+
+        return header;
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    StarHeader createHeader(std::string const& path, std::size_t size, bool checksum = true)
+    {
+        StarHeader header = createHeaderCommon(path).first;
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // MODIFY TIME
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        auto time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        HEADER_ASSIGN_OCTAL(mTime, time);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // SIZE
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        HEADER_ASSIGN_OCTAL(size, size);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // CHECKSUM
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        if (checksum)
+            calculateChecksum(header);
+
+        return header;
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    StarHeader createHeaderFromDiskNode(std::string path)
+    {
+        preprocessPath(path);
+
+        fs::path p{path};
+
+        if (!fs::exists(p))
+            throw std::invalid_argument("file does not exist");
+
+        auto isDir = fs::is_directory(p);
+        auto isRegFile = fs::is_regular_file(p);
+
+        if (!isDir && !isRegFile)
+            throw std::invalid_argument("disk node is neither a regular file nor a directory");
+
+        std::pair <StarHeader, fs::path> res = createHeaderCommon(path, isDir);
+        auto header = res.first;
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // MODE
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        auto status = fs::status(p);
+        HEADER_ASSIGN_OCTAL(fileMode, status.permissions());
 
         /////////////////////////////////////////////////////////////////////////////////////////////
         // SIZE
@@ -161,99 +330,17 @@ namespace StarTape
             header.typeflag = '5';
 
         /////////////////////////////////////////////////////////////////////////////////////////////
-        // LINK NAME
-        /////////////////////////////////////////////////////////////////////////////////////////////
-
-        HEADER_CLEAR(linkName);
-
-        /////////////////////////////////////////////////////////////////////////////////////////////
-        // MAGIC
-        /////////////////////////////////////////////////////////////////////////////////////////////
-
-        HEADER_ASSIGN(magic, "ustar");
-
-        /////////////////////////////////////////////////////////////////////////////////////////////
-        // VERSION
-        /////////////////////////////////////////////////////////////////////////////////////////////
-
-        HEADER_ASSIGN(version, "00");
-
-        /////////////////////////////////////////////////////////////////////////////////////////////
-        // USER NAME
-        /////////////////////////////////////////////////////////////////////////////////////////////
-
-        // I cannot be bothered with a proper solution here. try for env. variables, and clear if not available.
-        char * user_name = getenv("USER");
-        if (!user_name)
-        {
-             user_name = getenv("USERNAME");
-        }
-        if (user_name)
-        {
-            HEADER_ASSIGN(uName, user_name);
-        }
-
-        /////////////////////////////////////////////////////////////////////////////////////////////
-        // GROUP NAME
-        /////////////////////////////////////////////////////////////////////////////////////////////
-
-        // not portable -> clear
-        HEADER_CLEAR(gName);
-
-        /////////////////////////////////////////////////////////////////////////////////////////////
-        // DEV MAJOR
-        /////////////////////////////////////////////////////////////////////////////////////////////
-
-        HEADER_ASSIGN_OCTAL(devMajor, 0);
-
-        /////////////////////////////////////////////////////////////////////////////////////////////
-        // DEV MINOR
-        /////////////////////////////////////////////////////////////////////////////////////////////
-
-        HEADER_ASSIGN_OCTAL(devMinor, 0);
-
-        /////////////////////////////////////////////////////////////////////////////////////////////
         // CHECKSUM
         /////////////////////////////////////////////////////////////////////////////////////////////
 
-        uint32_t checksum = 0u;
-
-        std::array <char, 7> sum;
-
-        #define CHKSUM(FIELD) \
-        for (auto const& i : header.FIELD) \
-            checksum += static_cast <unsigned char> (i);
-
-        CHKSUM(fileName)
-        CHKSUM(fileMode)
-        CHKSUM(uid)
-        CHKSUM(gid)
-        CHKSUM(size)
-        CHKSUM(mTime)
-        CHKSUM(linkName)
-        CHKSUM(magic)
-        CHKSUM(version)
-        CHKSUM(uName)
-        CHKSUM(gName)
-        CHKSUM(devMajor)
-        CHKSUM(devMinor)
-        CHKSUM(prefix)
-
-        checksum += 8u * 32u;
-        checksum += static_cast <unsigned char> (header.typeflag);
-
-        assignOctal <7> (sum, checksum);
-        for (int i = 0; i != 7; ++i)
-            header.chksum[i] = sum[i];
-        header.chksum[7] = ' ';
-
-        #undef CHKSUM
-        #undef HEADER_ASSIGN
-        #undef HEADER_ASSIGN_OCTAL
-        #undef HEADER_CLEAR
+        calculateChecksum(header);
 
         return header;
     }
+//---------------------------------------------------------------------------------------------------------------------
+    #undef HEADER_ASSIGN
+    #undef HEADER_ASSIGN_OCTAL
+    #undef HEADER_CLEAR
 //---------------------------------------------------------------------------------------------------------------------
     std::string headerToString(StarHeader const& head)
     {

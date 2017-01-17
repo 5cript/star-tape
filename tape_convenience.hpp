@@ -152,10 +152,26 @@ namespace StarTape
     };
 
     /**
+     *  Creates an empty output Archive.
+     **/
+    template <CompressionType CT = CompressionType::None>
+    OutputArchiveDataBundle <typename CompressionTypeToWriter <CT>::type, std::ofstream> createOutputFileArchive(std::string const& fileName)
+    {
+        using RWT = typename CompressionTypeToWriter <CT>::type;
+
+        std::ofstream writer{fileName, std::ios_base::binary};
+        return OutputArchiveDataBundle <RWT, std::ofstream> {
+            {},
+            std::integral_constant <unsigned, 0> {},
+            std::move(writer)
+        };
+    }
+
+    /**
      *  Opens archive.
      **/
     template <CompressionType CT = CompressionType::None>
-    InputArchiveDataBundle <typename CompressionTypeToReader<CT>::type, std::ifstream> openInputFile(std::string const& fileName)
+    InputArchiveDataBundle <typename CompressionTypeToReader <CT>::type, std::ifstream> openInputFile(std::string const& fileName)
     {
         using RWT = typename CompressionTypeToReader<CT>::type;
 
@@ -226,7 +242,7 @@ namespace StarTape
     }
 
     template <typename ArchiveType, typename RWT, typename... List>
-    ArchiveType archive(ArchiveDataBundle <ArchiveType, RWT, List...>& bundle)
+    ArchiveType& archive(ArchiveDataBundle <ArchiveType, RWT, List...>& bundle)
     {
         return bundle.getArchive();
     }

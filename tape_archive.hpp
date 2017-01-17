@@ -5,6 +5,8 @@
 #include "tape_operation.hpp"
 
 #include <iostream>
+#include <string>
+#include <vector>
 
 namespace StarTape
 {

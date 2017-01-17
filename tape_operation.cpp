@@ -79,6 +79,12 @@ namespace StarTape { namespace TapeOperations
     {
     }
 //---------------------------------------------------------------------------------------------------------------------
+    AddString::AddString(std::string const& path, std::string data)
+        : data_{std::move(data)}
+        , header_{createHeaderFromString(path, data_)}
+    {
+    }
+//---------------------------------------------------------------------------------------------------------------------
     bool AddString::apply(TapeIndex* baseTape, OutputTapeArchive* destinationTape, TapeModificationContext* ctx)
     {
         ctx->writer->write(headerToString(header_).c_str(), Constants::ChunkSize);

@@ -49,6 +49,8 @@
 		<Unit filename="tape_core.hpp" />
 		<Unit filename="tape_entry.cpp" />
 		<Unit filename="tape_entry.hpp" />
+		<Unit filename="tape_file_proxy.cpp" />
+		<Unit filename="tape_file_proxy.hpp" />
 		<Unit filename="tape_fwd.hpp" />
 		<Unit filename="tape_header.cpp" />
 		<Unit filename="tape_header.hpp" />

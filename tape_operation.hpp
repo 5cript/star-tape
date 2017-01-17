@@ -69,6 +69,7 @@ namespace StarTape
         {
         public:
             AddString(std::string data, StarHeader header);
+            AddString(std::string const& path, std::string data);
             bool apply(TapeIndex* baseTape, OutputTapeArchive* destinationTape, TapeModificationContext* ctx) override;
             int getPrecedence() const override;
 
