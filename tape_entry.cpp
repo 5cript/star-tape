@@ -32,7 +32,7 @@ namespace StarTape
 
         StarHeader head;
 
-        #define READ(NAME) readPart(head.NAME.size(), &head.NAME.front())
+		#define READ(NAME) readPart(StarHeaderEntrySizes::NAME, &head.NAME.front())
         READ(fileName);
         READ(fileMode);
         READ(uid);
@@ -74,7 +74,7 @@ namespace StarTape
 
         StarHeader head;
 
-        #define READ(NAME) read <head.NAME.size()>(reader, head.NAME)
+        #define READ(NAME) read <StarHeaderEntrySizes::NAME>(reader, head.NAME)
         READ(fileName);
         READ(fileMode);
         READ(uid);
@@ -139,8 +139,8 @@ namespace StarTape
         else
         {
             StarHeader tempHead;
-            readHeaderEntry <Constants::PrefixHeaderOffset, tempHead.prefix.max_size()> (tempHead.prefix);
-            readHeaderEntry <Constants::FileNameHeaderOffset, tempHead.fileName.max_size()> (tempHead.fileName);
+			readHeaderEntry <Constants::PrefixHeaderOffset, StarHeaderEntrySizes::prefix> (tempHead.prefix);
+            readHeaderEntry <Constants::FileNameHeaderOffset, StarHeaderEntrySizes::fileName> (tempHead.fileName);
             return concatFileName(tempHead);
         }
     }

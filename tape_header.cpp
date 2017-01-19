@@ -43,13 +43,13 @@ namespace StarTape
     }
 //#####################################################################################################################
     #define HEADER_ASSIGN(FIELD, STRING) \
-    assign <header.FIELD.size()>(header.FIELD, STRING)
+	assign <StarHeaderEntrySizes::FIELD>(header.FIELD, STRING)
 
     #define HEADER_ASSIGN_OCTAL(FIELD, STRING) \
-    assignOctal <header.FIELD.size()> (header.FIELD, STRING)
+	assignOctal <StarHeaderEntrySizes::FIELD> (header.FIELD, STRING)
 
     #define HEADER_CLEAR(FIELD) \
-    clear <header.FIELD.size()> (header.FIELD)
+    clear <StarHeaderEntrySizes::FIELD> (header.FIELD)
 //---------------------------------------------------------------------------------------------------------------------
     void calculateChecksum(StarHeader& header)
     {

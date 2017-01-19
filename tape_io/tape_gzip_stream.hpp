@@ -4,6 +4,8 @@
 #include "../tape_reader.hpp"
 #include "../tape_writer.hpp"
 
+#if defined(ENABLE_GZIP) && ENABLE_GZIP == 1
+
 #include <boost/iostreams/filtering_stream.hpp>
 
 #include <iostream>
@@ -45,3 +47,5 @@ namespace StarTape
         boost::iostreams::filtering_ostream writer_;
     };
 }
+
+#endif

@@ -29,19 +29,19 @@ namespace StarTape
         constexpr unsigned int FileNameHeaderOffset = 0U;
         constexpr unsigned int EntryTypeHeaderOffset = 156U;
         constexpr unsigned int PrefixHeaderOffset = 345u;
-    }
+	}
 
     struct PosixHeader
     {
-        std::array <char, 100> fileName;
-        std::array <char, 8> fileMode;
-        std::array <char, 8> uid;
-        std::array <char, 8> gid;
-        std::array <char, 12> size;
-        std::array <char, 12> mTime;
-        std::array <char, 8> chksum;
-        char typeflag;
-        std::array <char, 100> linkName;
+		std::array <char, 100> fileName;
+		std::array <char, 8> fileMode;
+		std::array <char, 8> uid;
+		std::array <char, 8> gid;
+		std::array <char, 12> size;
+		std::array <char, 12> mTime;
+		std::array <char, 8> chksum;
+		char typeflag;
+		std::array <char, 100> linkName;
     };
 
     struct StarHeader : PosixHeader
@@ -55,6 +55,30 @@ namespace StarTape
         std::array <char, 155> prefix;
 
         StarHeader() = default;
+	};
+
+	struct PosixHeaderEntrySizes
+	{
+		constexpr static unsigned fileName = 100;
+		constexpr static unsigned fileMode = 8;
+		constexpr static unsigned uid = 8;
+		constexpr static unsigned gid = 8;
+		constexpr static unsigned size = 12;
+		constexpr static unsigned mTime = 12;
+		constexpr static unsigned chksum = 8;
+		constexpr static unsigned typeflag = 1;
+		constexpr static unsigned linkName = 100;
+	};
+
+	struct StarHeaderEntrySizes : public PosixHeaderEntrySizes
+	{
+		constexpr static unsigned magic = 6;
+		constexpr static unsigned version = 2;
+		constexpr static unsigned uName = 32;
+		constexpr static unsigned gName = 32;
+		constexpr static unsigned devMajor = 8;
+		constexpr static unsigned devMinor = 8;
+		constexpr static unsigned prefix = 155;
     };
 
     struct Sparse

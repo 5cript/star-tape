@@ -1,5 +1,7 @@
 #include "tape_gzip_stream.hpp"
 
+#if defined(ENABLE_GZIP) && ENABLE_GZIP == 1
+
 #include <boost/iostreams/filter/gzip.hpp>
 
 namespace StarTape
@@ -92,3 +94,5 @@ namespace StarTape
     }
 //#####################################################################################################################
 }
+
+#endif
