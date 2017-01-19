@@ -50,18 +50,6 @@ int main()
 int main()
 {
   auto bundle = createOutputFileArchive <CompressionType::None> ("new.tar");
-  archive(bundle) << StringProxy{"./bla.txt", "Hello World!"};
-}
-```
-
-## Example (Save String to archive on disk)
-
-```C++
-#include "star_tape.hpp"
-
-int main()
-{
-  auto bundle = createOutputFileArchive <CompressionType::None> ("new.tar");
   (TapeWaterfall{}
     << TapeOperations::AddString("bla.txt", "bla bla")
     << TapeOperations::AddString("bla2.txt", "bla bla")
