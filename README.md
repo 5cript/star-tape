@@ -111,7 +111,7 @@ int main()
 }
 ```
 
-## Example (old)
+## Example (Manual, indexing)
 
 ```C++
 #include "tape_archive.hpp"
@@ -125,10 +125,10 @@ int main()
 {
   using namespace StarTape;
 
-  TapeArchive archive;
+  InputTapeArchive archive;
 
-  FileTape myTarFile("./star.tar");
-  archive.open(&ftape, &ftape); // open for both reading and writing.
+  FileTapeReader myTarFile("./star.tar");
+  archive.open(&ftape);
 
   auto index = archive.makeIndex();
   for (auto const& i : index)
