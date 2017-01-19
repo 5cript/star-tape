@@ -138,7 +138,7 @@ namespace StarTape
         TapeWaterfall() = default;
 
         TapeWaterfall& operator<<(TapeModifier&& operation);
-        void apply(TapeIndex* baseTape, OutputTapeArchive* destinationTape);
+        void apply(OutputTapeArchive* destinationTape, TapeIndex* baseTape = nullptr, bool atEnd = false);
 
     private:
         std::vector <std::unique_ptr <TapeModifier>> operations_;

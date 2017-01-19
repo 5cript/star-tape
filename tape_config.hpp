@@ -1,7 +1,7 @@
 #pragma once
 
-#define ENABLE_BZIP2 1
-#define ENABLE_GZIP 1
+#define ENABLE_BZIP2 0
+#define ENABLE_GZIP 0
 
 namespace StarTape
 {

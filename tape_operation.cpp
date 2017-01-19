@@ -205,7 +205,7 @@ namespace StarTape { namespace TapeOperations
         return *this;
     }
 //---------------------------------------------------------------------------------------------------------------------
-    void TapeWaterfall::apply(TapeIndex* baseTape, OutputTapeArchive* destinationTape)
+    void TapeWaterfall::apply(OutputTapeArchive* destinationTape, TapeIndex* baseTape, bool atEnd)
     {
         std::sort(std::begin(operations_), std::end(operations_), [](std::unique_ptr <TapeModifier> const& lhs, std::unique_ptr <TapeModifier> const &rhs){
             return lhs->getPrecedence() < rhs->getPrecedence();
@@ -213,6 +213,13 @@ namespace StarTape { namespace TapeOperations
 
         TapeModificationContext ctx;
         ctx.writer = destinationTape->getWriter();
+        if (atEnd)
+        {
+            ctx.writer->seekEnd();
+            auto fileSize = ctx.writer->tellp();
+            ctx.lastOccupiedChunk = fileSize / Constants::ChunkSize + !!(fileSize % Constants::ChunkSize);
+        }
+
         for (auto const& operation : operations_)
         {
             operation->apply(baseTape, destinationTape, &ctx);
