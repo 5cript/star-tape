@@ -62,7 +62,10 @@ int main()
 int main()
 {
   auto bundle = createOutputFileArchive <CompressionType::None> ("new.tar");
-  archive(bundle) << StringProxy{"./bla.txt", "Hello World!"};
+  (TapeWaterfall{}
+    << TapeOperations::AddString("bla.txt", "bla bla")
+    << TapeOperations::AddString("bla2.txt", "bla bla")
+  ).apply(&archive(bundle));
 }
 ```
 
@@ -93,7 +96,7 @@ int main()
     << AddDirectory("./tape_io") // add directory from disk
     << RemoveEntry("./to_tar/test.txt") // remove file entry (NOT RECURSIVE!!!)
     << Adopt() // Adopt all files and directories from input archive
-  ).apply(&index, outArchive);
+  ).apply(outArchive, &index);
 }
 ```
 
