@@ -78,10 +78,14 @@ namespace StarTape
     using OutputArchiveDataBundle = ArchiveDataBundle <OutputTapeArchive, RWT, List...>;
 
     enum class CompressionType
-    {
-        None,
-        Gzip,
-        Bzip2
+	{
+		None
+#		if defined(ENABLE_GZIP) && ENABLE_GZIP == 1
+		,Gzip
+#		endif
+#		if defined(ENABLE_BZIP2) && ENABLE_BZIP2 == 1
+		,Bzip2
+#		endif
     };
 
     template <CompressionType>
@@ -95,17 +99,21 @@ namespace StarTape
         using type = StreamTapeReader;
     };
 
+#	if defined(ENABLE_GZIP) && ENABLE_GZIP == 1
     template <>
     struct CompressionTypeToReader <CompressionType::Gzip>
     {
         using type = GzipStreamTapeReader;
     };
+#	endif
 
+#	if defined(ENABLE_BZIP2) && ENABLE_BZIP2 == 1
     template <>
     struct CompressionTypeToReader <CompressionType::Bzip2>
     {
         using type = Bzip2StreamTapeReader;
-    };
+	};
+#	endif
 
     template <CompressionType>
     struct CompressionTypeToWriter
@@ -118,17 +126,21 @@ namespace StarTape
         using type = StreamTapeWriter;
     };
 
+#	if defined(ENABLE_GZIP) && ENABLE_GZIP == 1
     template <>
     struct CompressionTypeToWriter <CompressionType::Gzip>
     {
         using type = GzipStreamTapeWriter;
-    };
+	};
+#	endif
 
+#	if defined(ENABLE_BZIP2) && ENABLE_BZIP2 == 1
     template <>
     struct CompressionTypeToWriter <CompressionType::Bzip2>
     {
         using type = Bzip2StreamTapeWriter;
     };
+#	endif
 
     template <typename T>
     struct ReadOrWriteTape
@@ -139,17 +151,25 @@ namespace StarTape
     struct ReadOrWriteTape <InputTapeArchive>
     {
         using stream = StreamTapeReader;
-        using gzip = GzipStreamTapeReader;
-        using bzip2 = Bzip2StreamTapeReader;
+#		if defined(ENABLE_GZIP) && ENABLE_GZIP == 1
+		using gzip = GzipStreamTapeReader;
+#		endif
+#		if defined(ENABLE_BZIP2) && ENABLE_BZIP2 == 1
+		using bzip2 = Bzip2StreamTapeReader;
+#		endif
     };
 
     template <>
     struct ReadOrWriteTape <OutputTapeArchive>
     {
         using stream = StreamTapeWriter;
-        using gzip = GzipStreamTapeWriter;
-        using bzip2 = Bzip2StreamTapeWriter;
-    };
+#		if defined(ENABLE_GZIP) && ENABLE_GZIP == 1
+		using gzip = GzipStreamTapeWriter;
+#		endif
+#		if defined(ENABLE_BZIP2) && ENABLE_BZIP2 == 1
+		using bzip2 = Bzip2StreamTapeWriter;
+#		endif
+	};
 
     /**
      *  Creates an empty output Archive.
