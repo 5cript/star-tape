@@ -217,7 +217,7 @@ namespace StarTape
         std::string result;
         uint64_t remainingRead = entry->fileSize;
         do {
-            uint64_t curRead = std::min(remainingRead, 4096ull);
+            uint64_t curRead = std::min(remainingRead, static_cast <decltype(remainingRead)> (4096));
             result.resize(result.size() + curRead);
             auto actualRead = reader->read(&*result.begin() + result.size() - curRead, curRead);
             if (actualRead == 0ull)
@@ -237,7 +237,7 @@ namespace StarTape
         std::array <char, 4096> buffer;
         uint64_t remainingRead = entry->fileSize;
         do {
-            uint64_t curRead = std::min(remainingRead, 4096ull);
+            uint64_t curRead = std::min(remainingRead, static_cast <decltype(remainingRead)> (4096));
             auto actualRead = reader->read(buffer.data(), curRead);
             if (actualRead == 0ull)
                 break;

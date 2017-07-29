@@ -8,3 +8,4 @@ __history/
 *.tar
 main.cpp
 *.astcache
+build/*
