@@ -97,7 +97,7 @@ namespace StarTape
         char isExtended;
     };
 
-    StarHeader createHeaderFromDiskNode(std::string path);
+    StarHeader createHeaderFromDiskNode(std::string path, std::string pathOverwrite = {});
     StarHeader createHeaderFromString(std::string const& path, std::string const& dataString);
     StarHeader createHeader(std::string const& path, std::size_t size, bool checksum);
 

@@ -47,11 +47,13 @@ namespace StarTape
         {
         public:
             AddFile(std::string fileName);
+            AddFile(std::string fileName, std::string pathRename);
             bool apply(TapeIndex* baseTape, OutputTapeArchive* destinationTape, TapeModificationContext* ctx) override;
             int getPrecedence() const override;
 
         private:
             std::string fileName_;
+            std::string pathRename_;
         };
 
         class AddDirectory : public TapeModifierCloneable <AddDirectory>

@@ -24,12 +24,19 @@ namespace StarTape { namespace TapeOperations
 //#####################################################################################################################
     AddFile::AddFile(std::string fileName)
         : fileName_{std::move(fileName)}
+        , pathRename_{}
+    {
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    AddFile::AddFile(std::string fileName, std::string pathRename)
+        : fileName_{std::move(fileName)}
+        , pathRename_{std::move(pathRename)}
     {
     }
 //---------------------------------------------------------------------------------------------------------------------
     bool AddFile::apply(TapeIndex* baseTape, OutputTapeArchive* destinationTape, TapeModificationContext* ctx)
     {
-        auto header = createHeaderFromDiskNode(fileName_);
+        auto header = createHeaderFromDiskNode(fileName_, pathRename_);
 
         if (fs::is_regular_file(fileName_))
         {

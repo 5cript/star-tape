@@ -279,7 +279,7 @@ namespace StarTape
         return header;
     }
 //---------------------------------------------------------------------------------------------------------------------
-    StarHeader createHeaderFromDiskNode(std::string path)
+    StarHeader createHeaderFromDiskNode(std::string path, std::string pathOverwrite)
     {
         preprocessPath(path);
 
@@ -294,7 +294,11 @@ namespace StarTape
         if (!isDir && !isRegFile)
             throw std::invalid_argument("disk node is neither a regular file nor a directory");
 
-        std::pair <StarHeader, fs::path> res = createHeaderCommon(path, isDir);
+        if (pathOverwrite.empty())
+            pathOverwrite = path;
+        else
+            preprocessPath(pathOverwrite);
+        std::pair <StarHeader, fs::path> res = createHeaderCommon(pathOverwrite, isDir);
         auto header = res.first;
 
         /////////////////////////////////////////////////////////////////////////////////////////////
