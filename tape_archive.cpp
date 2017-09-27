@@ -2,6 +2,14 @@
 
 #include <stdexcept>
 
+#if defined(ENABLE_BZIP2) && ENABLE_BZIP2 == 1
+#   pragma message "BZip2 enabled"
+#endif // ENABLE_BZIP2
+
+#if defined(ENABLE_GZIP) && ENABLE_GZIP == 1
+#   pragma message "GZip enabled"
+#endif // defined
+
 namespace StarTape
 {
 //#####################################################################################################################

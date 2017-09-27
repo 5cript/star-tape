@@ -27,7 +27,7 @@ set(libs "")
 if(BZIP2_FOUND)
 	message("-- BZip2 found, adding to target")
 	target_include_directories(${star-tape} PUBLIC ${BZIP2_INCLUDE_DIR})
-	target_compile_definitions(${star-tape} PUBLIC ENABLE_BZIP2=1)
+	target_compile_definitions(${star-tape} PUBLIC "ENABLE_BZIP2=1")
 	
 	set(libs "${libs}${BZIP2_LIBRARIES}")
 endif()
@@ -35,12 +35,10 @@ endif()
 if(ZLIB_FOUND)
 	message("-- zlib found, adding to target")
 	target_include_directories(${star-tape} PUBLIC ${ZLIB_INCLUDE_DIR})
-	target_compile_definitions(${star-tape} PUBLIC ENABLE_GZIP=1)
+	target_compile_definitions(${star-tape} PUBLIC "ENABLE_GZIP=1")
 	
 	set(libs "${libs}${ZLIB_LIBRARIES}")
 endif()
-
-message(${libs})
 
 target_link_libraries(${star-tape} ${libs} Boost::iostreams Boost::filesystem Boost::system)
 
