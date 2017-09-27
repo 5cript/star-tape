@@ -225,6 +225,8 @@ namespace StarTape { namespace TapeOperations
             ctx.writer->seekEnd();
             auto fileSize = ctx.writer->tellp();
             ctx.lastOccupiedChunk = fileSize / Constants::ChunkSize + !!(fileSize % Constants::ChunkSize);
+            auto a = ctx.lastOccupiedChunk;
+            auto b = fileSize;
         }
 
         for (auto const& operation : operations_)

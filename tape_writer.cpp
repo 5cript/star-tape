@@ -9,6 +9,8 @@ namespace StarTape
     void fill(ITapeWriter* lhs, uint64_t written)
     {
         auto trail = Constants::ChunkSize - (written % Constants::ChunkSize);
+        if (trail == Constants::ChunkSize)
+            return;
         while (trail--)
             lhs->put('\0');
     }

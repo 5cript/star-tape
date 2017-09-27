@@ -6,9 +6,6 @@ set(star-tape "star_tape")
 # Project
 project(star-tape)
 
-include("FindZLIB")
-include("FindBzip2")
-
 # Add files
 file(GLOB sources "*.cpp" "tape_io/*.cpp")
 
@@ -21,11 +18,14 @@ find_package(Boost REQUIRED COMPONENTS
 	iostreams
 )
 
+find_package(BZip2)
+find_package(ZLIB)
+
 set(libs "")
 
 # Compression
 if(BZIP2_FOUND)
-	message("-- bzip2 found, adding to target")
+	message("-- BZip2 found, adding to target")
 	target_include_directories(${star-tape} PUBLIC ${BZIP2_INCLUDE_DIR})
 	target_compile_definitions(${star-tape} PUBLIC ENABLE_BZIP2=1)
 	
@@ -45,4 +45,4 @@ message(${libs})
 target_link_libraries(${star-tape} ${libs} Boost::iostreams Boost::filesystem Boost::system)
 
 # Compiler Options
-target_compile_options(${star-tape} PUBLIC -fexceptions -std=c++14 -O2 -Wall -pedantic-errors -pedantic)
+target_compile_options(${star-tape} PUBLIC -fexceptions -std=c++14 -O3 -Wall -pedantic-errors -pedantic)
