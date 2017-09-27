@@ -111,7 +111,7 @@ namespace StarTape { namespace TapeOperations
 
         for (auto i = std::begin(*baseTape); i != std::end(*baseTape); ++i)
         {
-            auto* reader = baseTape->getHeaderReader(i);
+            auto* reader = baseTape->getHeaderReader(*i);
             write(ctx->writer, reader, i->getChunkCount());
         }
         return true;
@@ -225,8 +225,6 @@ namespace StarTape { namespace TapeOperations
             ctx.writer->seekEnd();
             auto fileSize = ctx.writer->tellp();
             ctx.lastOccupiedChunk = fileSize / Constants::ChunkSize + !!(fileSize % Constants::ChunkSize);
-            auto a = ctx.lastOccupiedChunk;
-            auto b = fileSize;
         }
 
         for (auto const& operation : operations_)

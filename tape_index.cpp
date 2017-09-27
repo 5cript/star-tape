@@ -188,34 +188,34 @@ namespace StarTape
         });
     }
 //---------------------------------------------------------------------------------------------------------------------
-    ITapeReader* TapeIndex::getContentReader(iterator const& entry)
+    ITapeReader* TapeIndex::getContentReader(TapeRegion const& entry)
     {
         auto* reader = archive_->getReader();
         if (reader == nullptr)
             throw std::runtime_error("the tar file is not opened for reading");
 
-        reader->seekg((1 + entry->startChunk) * Constants::ChunkSize);
+        reader->seekg((1 + entry.startChunk) * Constants::ChunkSize);
         return reader;
     }
 //---------------------------------------------------------------------------------------------------------------------
-    ITapeReader* TapeIndex::getHeaderReader(iterator const& entry)
+    ITapeReader* TapeIndex::getHeaderReader(TapeRegion const& entry)
     {
         auto* reader = archive_->getReader();
         if (reader == nullptr)
             throw std::runtime_error("the tar file is not opened for reading");
 
-        reader->seekg(entry->startChunk * Constants::ChunkSize);
+        reader->seekg(entry.startChunk * Constants::ChunkSize);
         return reader;
     }
 //---------------------------------------------------------------------------------------------------------------------
-    std::string TapeIndex::readFile(iterator const& entry)
+    std::string TapeIndex::readFile(TapeRegion const& entry)
     {
         auto reader = getContentReader(entry);
         if (reader == nullptr)
             throw std::runtime_error("the tar file is not opened for reading");
 
         std::string result;
-        uint64_t remainingRead = entry->fileSize;
+        uint64_t remainingRead = entry.fileSize;
         do {
             uint64_t curRead = std::min(remainingRead, static_cast <decltype(remainingRead)> (4096));
             result.resize(result.size() + curRead);
@@ -228,14 +228,14 @@ namespace StarTape
         return result;
     }
 //---------------------------------------------------------------------------------------------------------------------
-    std::ostream& TapeIndex::writeFileToStream(iterator const& entry, std::ostream& stream)
+    std::ostream& TapeIndex::writeFileToStream(TapeRegion const& entry, std::ostream& stream)
     {
         auto reader = getContentReader(entry);
         if (reader == nullptr)
             throw std::runtime_error("the tar file is not opened for reading");
 
         std::array <char, 4096> buffer;
-        uint64_t remainingRead = entry->fileSize;
+        uint64_t remainingRead = entry.fileSize;
         do {
             uint64_t curRead = std::min(remainingRead, static_cast <decltype(remainingRead)> (4096));
             auto actualRead = reader->read(buffer.data(), curRead);

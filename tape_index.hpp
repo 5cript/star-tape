@@ -69,22 +69,22 @@ namespace StarTape
         /**
          *  Returns a tape reader for the exact entry on the tape, located on the file content start.
          **/
-        ITapeReader* getContentReader(iterator const& entry);
+        ITapeReader* getContentReader(TapeRegion const& entry);
 
         /**
          *  Returns a tape reader for the exact entry on the tape, located on the header.
          **/
-        ITapeReader* getHeaderReader(iterator const& entry);
+        ITapeReader* getHeaderReader(TapeRegion const& entry);
 
         /**
          *  Reads the entire file into a string.
          */
-        std::string readFile(iterator const& entry);
+        std::string readFile(TapeRegion const& entry);
 
         /**
          *  Reads the entire file into a stream.
          */
-        std::ostream& writeFileToStream(iterator const& entry, std::ostream& stream);
+        std::ostream& writeFileToStream(TapeRegion const& entry, std::ostream& stream);
 
         /**
          *  Removes the entry from the index.
