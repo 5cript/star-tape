@@ -96,6 +96,11 @@ namespace StarTape
          **/
         InputTapeArchive* getArchive() const;
 
+        /**
+         *  @return The amount of tape regions.
+         */
+        std::vector <TapeRegion>::size_type size() const;
+
     private:
         void makeIndex(std::ostream* dump);
 

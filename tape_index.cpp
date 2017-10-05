@@ -67,6 +67,12 @@ namespace StarTape
             auto chunkCount = archive_->getChunkCount();
             for (unsigned currentChunk = 0u; currentChunk != chunkCount; ++currentChunk)
             {
+                char chunkStart;
+                reader->read(&chunkStart, 1);
+
+                if (chunkStart == '\0') // EOF
+                    return;
+
                 TapeEntry entry{archive_, currentChunk};
                 currentChunk = insertRegion(entry, currentChunk);
             }
@@ -261,6 +267,11 @@ namespace StarTape
     InputTapeArchive* TapeIndex::getArchive() const
     {
         return archive_;
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    std::vector <TapeRegion>::size_type TapeIndex::size() const
+    {
+        return regions_.size();
     }
 //#####################################################################################################################
 }
