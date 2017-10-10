@@ -70,9 +70,6 @@ namespace StarTape
                 char chunkStart;
                 reader->read(&chunkStart, 1);
 
-                if (chunkStart == '\0') // EOF
-                    return;
-
                 TapeEntry entry{archive_, currentChunk};
                 currentChunk = insertRegion(entry, currentChunk);
             }
@@ -173,9 +170,9 @@ namespace StarTape
         return regions_.cend();
     }
 //---------------------------------------------------------------------------------------------------------------------
-    TapeEntry TapeIndex::getEntry(iterator const& pos)
+    TapeEntry TapeIndex::getEntry(TapeRegion const& pos)
     {
-        return TapeEntry{archive_, pos->startChunk, pos->endChunk};
+        return TapeEntry{archive_, pos.startChunk, pos.endChunk};
     }
 //---------------------------------------------------------------------------------------------------------------------
     TapeIndex::iterator TapeIndex::find(std::string const& fileName)

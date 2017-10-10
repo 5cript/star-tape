@@ -95,7 +95,7 @@ namespace StarTape
 
         header_ = head;
 
-        return nullptr;
+        return &header_.get();
     }
 //---------------------------------------------------------------------------------------------------------------------
     TarFormat TapeEntry::getFormat() const

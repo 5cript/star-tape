@@ -48,7 +48,7 @@ namespace StarTape
         const_iterator cbegin() const;
         const_iterator cend() const;
 
-        TapeEntry getEntry(iterator const& pos);
+        TapeEntry getEntry(TapeRegion const& pos);
 
         /**
          *  finds entry on tape by exact fileName match (trailing NULLs ignored).
