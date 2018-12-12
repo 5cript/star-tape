@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <functional>
 
 namespace StarTape
 {
@@ -93,6 +94,22 @@ namespace StarTape
         };
 
         /**
+         *  Adds a symbolic link
+         **/
+        class AddLink : public TapeModifierCloneable <AddLink>
+        {
+        public:
+            AddLink(std::string actualFile, std::string linkName);
+            bool apply(TapeIndex* baseTape, OutputTapeArchive* destinationTape, TapeModificationContext* ctx) override;
+            int getPrecedence() const override;
+
+        private:
+            std::string actualFile_;
+            std::string linkName_;
+            std::string pathRename_;
+        };
+
+        /**
          *  Clones all from other tape (over TapeIndex)
          **/
         class Adopt : public TapeModifierCloneable <Adopt>
@@ -141,8 +158,10 @@ namespace StarTape
 
         TapeWaterfall& operator<<(TapeModifier&& operation);
         void apply(OutputTapeArchive* destinationTape, TapeIndex* baseTape = nullptr, bool atEnd = false);
+        void setProgressCallback(std::function <void(int, int)> const& cb);
 
     private:
         std::vector <std::unique_ptr <TapeModifier>> operations_;
+        std::function <void(int, int)> progress_;
     };
 }

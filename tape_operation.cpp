@@ -104,6 +104,29 @@ namespace StarTape { namespace TapeOperations
         return -10;
     }
 //#####################################################################################################################
+    AddLink::AddLink(std::string actualFile, std::string linkName)
+        : actualFile_{std::move(actualFile)}
+        , linkName_{std::move(linkName)}
+    {
+
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    bool AddLink::apply(TapeIndex* baseTape, OutputTapeArchive* destinationTape, TapeModificationContext* ctx)
+    {
+        //auto header = createHeaderFromDiskNode(fileName_, pathRename_);
+        auto header = createLinkHeader(actualFile_, linkName_, true);
+
+        // write header
+        ctx->writer->write(headerToString(header).c_str(), Constants::ChunkSize);
+
+        return true;
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    int AddLink::getPrecedence() const
+    {
+        return -10;
+    }
+//#####################################################################################################################
     bool Adopt::apply(TapeIndex* baseTape, OutputTapeArchive* destinationTape, TapeModificationContext* ctx)
     {
         if (!baseTape->getArchive()->getReader()->canSeek())
@@ -227,9 +250,15 @@ namespace StarTape { namespace TapeOperations
             ctx.lastOccupiedChunk = fileSize / Constants::ChunkSize + !!(fileSize % Constants::ChunkSize);
         }
 
+        int counter = 0;
+        if (progress_)
+            progress_(0, operations_.size());
         for (auto const& operation : operations_)
         {
             operation->apply(baseTape, destinationTape, &ctx);
+            ++counter;
+            if (progress_)
+                progress_(counter, operations_.size());
         }
 
         // END OF FILE
@@ -237,6 +266,11 @@ namespace StarTape { namespace TapeOperations
         ctx.writer->write(null, 1024);
 
         operations_.clear();
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    void TapeWaterfall::setProgressCallback(std::function <void(int, int)> const& cb)
+    {
+        progress_ = cb;
     }
 //#####################################################################################################################
 }

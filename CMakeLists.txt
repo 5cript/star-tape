@@ -3,6 +3,10 @@ cmake_minimum_required (VERSION 3.0)
 
 set(star-tape "star_tape")
 
+if(NOT "${CMAKE_CXX_STANDARD}")
+	set(CMAKE_CXX_STANDARD 17)
+endif()
+
 # Project
 project(star-tape)
 
@@ -43,4 +47,7 @@ endif()
 target_link_libraries(${star-tape} ${libs} Boost::iostreams Boost::filesystem Boost::system)
 
 # Compiler Options
-target_compile_options(${star-tape} PUBLIC -fexceptions -std=c++14 -O3 -Wall -pedantic-errors -pedantic)
+set(DEBUG_OPTIONS "-fexceptions -g -Wall -pedantic-errors -pedantic")
+set(RELEASE_OPTIONS "-fexceptions -O3 -Wall -pedantic-errors -pedantic")
+target_compile_options(${star-tape} PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_OPTIONS}>")
+target_compile_options(${star-tape} PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_OPTIONS}>")

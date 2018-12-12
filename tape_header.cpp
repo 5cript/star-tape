@@ -290,6 +290,7 @@ namespace StarTape
 
         auto isDir = fs::is_directory(p);
         auto isRegFile = fs::is_regular_file(p);
+        auto isSymLink = fs::is_symlink(p);
 
         if (!isDir && !isRegFile)
             throw std::invalid_argument("disk node is neither a regular file nor a directory");
@@ -330,6 +331,8 @@ namespace StarTape
 
         if (isRegFile)
             header.typeflag = '0';
+        else if (isSymLink)
+            header.typeflag = '2';
         else
             header.typeflag = '5';
 
@@ -338,6 +341,56 @@ namespace StarTape
         /////////////////////////////////////////////////////////////////////////////////////////////
 
         calculateChecksum(header);
+
+        return header;
+    }
+//---------------------------------------------------------------------------------------------------------------------
+    StarHeader createLinkHeader(std::string originalFile, std::string linkName, bool checksum)
+    {
+        preprocessPath(originalFile);
+        preprocessPath(linkName);
+
+        if (linkName.size() > 100)
+            throw std::runtime_error("link is too long");
+
+        StarHeader header = createHeaderCommon(linkName, false).first;
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // MODIFY TIME
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        auto time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        HEADER_ASSIGN_OCTAL(mTime, time);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // SIZE
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        HEADER_ASSIGN_OCTAL(size, 0);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // LINK
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        HEADER_ASSIGN(linkName, originalFile);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // FILEMODE & TYPE
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        HEADER_ASSIGN_OCTAL(fileMode,
+            fs::owner_read | fs::owner_write | fs::owner_exe |
+            fs::group_read | fs::group_write | fs::group_exe |
+            fs::others_read | fs::others_write | fs::others_exe
+        );
+        header.typeflag = '2';
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        // CHECKSUM
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+        if (checksum)
+            calculateChecksum(header);
 
         return header;
     }

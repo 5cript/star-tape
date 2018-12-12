@@ -100,6 +100,7 @@ namespace StarTape
     StarHeader createHeaderFromDiskNode(std::string path, std::string pathOverwrite = {});
     StarHeader createHeaderFromString(std::string const& path, std::string const& dataString);
     StarHeader createHeader(std::string const& path, std::size_t size, bool checksum);
+    StarHeader createLinkHeader(std::string originalFile, std::string linkName, bool checksum);
 
     std::string headerToString(StarHeader const& head);
 
