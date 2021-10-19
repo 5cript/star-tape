@@ -18,6 +18,11 @@ add_library(star-tape STATIC
 	"src/star-tape/tape_index.cpp"
 	"src/star-tape/tape_operation.cpp"
 	"src/star-tape/tape_writer.cpp"
+
+	"src/star-tape/tape_io/tape_bzip2_stream.cpp"
+	"src/star-tape/tape_io/tape_file.cpp"
+	"src/star-tape/tape_io/tape_gzip_stream.cpp"
+	"src/star-tape/tape_io/tape_stream.cpp"
 )
 
 find_package(Boost REQUIRED COMPONENTS
