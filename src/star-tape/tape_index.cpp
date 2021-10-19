@@ -1,7 +1,7 @@
-#include "tape_index.hpp"
+#include <star-tape/tape_index.hpp>
 
-#include "tape_archive.hpp"
-#include "tape_entry.hpp"
+#include <star-tape/tape_archive.hpp>
+#include <star-tape/tape_entry.hpp>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/range/as_array.hpp>

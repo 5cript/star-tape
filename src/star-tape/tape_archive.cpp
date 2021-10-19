@@ -1,4 +1,4 @@
-#include "tape_archive.hpp"
+#include <star-tape/tape_archive.hpp>
 
 #include <stdexcept>
 

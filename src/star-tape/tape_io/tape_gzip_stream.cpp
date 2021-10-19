@@ -1,4 +1,4 @@
-#include "tape_gzip_stream.hpp"
+#include <star-tape/tape_io/tape_gzip_stream.hpp>
 
 #if defined(ENABLE_GZIP) && ENABLE_GZIP == 1
 

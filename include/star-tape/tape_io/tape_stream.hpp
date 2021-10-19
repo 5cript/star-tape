@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../tape_reader.hpp"
-#include "../tape_writer.hpp"
+#include <star-tape/tape_reader.hpp>
+#include <star-tape/tape_writer.hpp>
 
 #include <iostream>
 

@@ -1,7 +1,7 @@
-#include "tape_operation.hpp"
-#include "tape_archive.hpp"
-#include "tape_index.hpp"
-#include "tape_reader.hpp"
+#include <star-tape/tape_operation.hpp>
+#include <star-tape/tape_archive.hpp>
+#include <star-tape/tape_index.hpp>
+#include <star-tape/tape_reader.hpp>
 
 #include <boost/filesystem.hpp>
 #include <fstream>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tape_io_base.hpp"
+#include <star-tape/tape_io_base.hpp>
 
 #include <cstdint>
 #include <string>

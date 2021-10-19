@@ -1,6 +1,6 @@
-#include "tape_core.hpp"
-#include "tape_header.hpp"
-#include "tape_utility.hpp"
+#include <star-tape/tape_core.hpp>
+#include <star-tape/tape_header.hpp>
+#include <star-tape/tape_utility.hpp>
 
 #include <boost/filesystem.hpp>
 #include <chrono>

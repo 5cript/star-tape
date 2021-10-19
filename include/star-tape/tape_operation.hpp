@@ -1,9 +1,9 @@
 #pragma once
 
-#include "tape_core.hpp"
-#include "tape_header.hpp"
-#include "tape_fwd.hpp"
-#include "tape_writer.hpp"
+#include <star-tape/tape_core.hpp>
+#include <star-tape/tape_header.hpp>
+#include <star-tape/tape_fwd.hpp>
+#include <star-tape/tape_writer.hpp>
 
 #include <string>
 #include <vector>

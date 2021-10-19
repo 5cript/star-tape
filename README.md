@@ -105,10 +105,10 @@ int main()
 ## Example (Manual, indexing)
 
 ```C++
-#include "tape_archive.hpp"
-#include "tape_entry.hpp"
+#include <star-tape/tape_archive.hpp>
+#include <star-tape/tape_entry.hpp>
 
-#include "tape_io/tape_file.hpp"
+#include <star-tape/tape_io/tape_file.hpp>
 
 #include <iostream>
 

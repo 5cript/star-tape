@@ -1,5 +1,5 @@
-#include "tape_stream.hpp"
-#include "../tape_core.hpp"
+#include <star-tape/tape_io/tape_stream.hpp>
+#include <star-tape/tape_core.hpp>
 
 namespace StarTape
 {

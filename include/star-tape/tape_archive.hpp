@@ -1,8 +1,8 @@
 #pragma once
 
-#include "tape_fwd.hpp"
-#include "tape_index.hpp"
-#include "tape_operation.hpp"
+#include <star-tape/tape_fwd.hpp>
+#include <star-tape/tape_index.hpp>
+#include <star-tape/tape_operation.hpp>
 
 #include <iostream>
 #include <string>

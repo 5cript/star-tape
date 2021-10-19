@@ -1,11 +1,11 @@
 #pragma once
 
-#include "tape_archive.hpp"
+#include <star-tape/tape_archive.hpp>
 
-#include "tape_io/tape_file.hpp"
-#include "tape_io/tape_bzip2_stream.hpp"
-#include "tape_io/tape_gzip_stream.hpp"
-#include "tape_io/tape_stream.hpp"
+#include <star-tape/tape_io/tape_file.hpp>
+#include <star-tape/tape_io/tape_bzip2_stream.hpp>
+#include <star-tape/tape_io/tape_gzip_stream.hpp>
+#include <star-tape/tape_io/tape_stream.hpp>
 
 #include <iostream>
 #include <fstream>

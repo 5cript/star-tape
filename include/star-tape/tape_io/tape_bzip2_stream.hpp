@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../tape_config.hpp"
-#include "../tape_reader.hpp"
-#include "../tape_writer.hpp"
+#include <star-tape/tape_config.hpp>
+#include <star-tape/tape_reader.hpp>
+#include <star-tape/tape_writer.hpp>
 
-#if defined(ENABLE_GZIP) && ENABLE_GZIP == 1
+#if defined(ENABLE_BZIP2) && ENABLE_BZIP2 == 1
 
 #include <boost/iostreams/filtering_stream.hpp>
 
@@ -12,10 +12,10 @@
 
 namespace StarTape
 {
-    class GzipStreamTapeReader : public ITapeReader
+    class Bzip2StreamTapeReader : public ITapeReader
     {
     public:
-        GzipStreamTapeReader(std::istream* stream);
+        Bzip2StreamTapeReader(std::istream* stream);
 
         void seekg(uint64_t position) override;
         char get() override;
@@ -31,10 +31,10 @@ namespace StarTape
         boost::iostreams::filtering_istream reader_;
     };
 
-    class GzipStreamTapeWriter : public ITapeWriter
+    class Bzip2StreamTapeWriter : public ITapeWriter
     {
     public:
-        GzipStreamTapeWriter(std::ostream* stream);
+        Bzip2StreamTapeWriter(std::ostream* stream);
 
         void seekp(uint64_t position) override;
         void put(char c) override;

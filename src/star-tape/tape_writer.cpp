@@ -1,5 +1,5 @@
-#include "tape_writer.hpp"
-#include "tape_core.hpp"
+#include <star-tape/tape_writer.hpp>
+#include <star-tape/tape_core.hpp>
 
 #include <array>
 

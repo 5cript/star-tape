@@ -1,4 +1,4 @@
-#include "tape_bzip2_stream.hpp"
+#include <star-tape/tape_io/tape_bzip2_stream.hpp>
 #if defined(ENABLE_BZIP2) && ENABLE_BZIP2 == 1
 
 #include <boost/iostreams/filter/bzip2.hpp>
